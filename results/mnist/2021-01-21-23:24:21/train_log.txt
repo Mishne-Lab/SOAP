@@ -1,0 +1,169 @@
+None
+('training transformations: ', Compose(
+    ToTensor()
+))
+('optim: ', SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0001
+))
+('schedule: ', <torch.optim.lr_scheduler.StepLR object at 0x7f5cef3406d0>)
+('attack: ', 'fgsm', '-', 0.1, ', ', 0.01, '*', 40)
+('auxiliary: ', None, ' - alpha = 100.0')
+Start training...
+epoch: 0
+train loss: 1.29766880829 / acc: 0.554883333333
+val loss: 0.309546762818 / acc: 0.9278
+epoch: 1
+train loss: 0.983249710538 / acc: 0.683033333333
+val loss: 0.24248627163 / acc: 0.9389
+epoch: 2
+train loss: 0.924717794371 / acc: 0.707366666667
+val loss: 0.24332773228 / acc: 0.9374
+epoch: 3
+train loss: 0.888927594464 / acc: 0.721566666667
+val loss: 0.227588172106 / acc: 0.9421
+epoch: 4
+train loss: 0.864605491105 / acc: 0.734383333333
+val loss: 0.23013781195 / acc: 0.9352
+epoch: 5
+train loss: 0.846608402574 / acc: 0.739933333333
+val loss: 0.186911823841 / acc: 0.9485
+epoch: 6
+train loss: 0.833555199652 / acc: 0.744183333333
+val loss: 0.189393280711 / acc: 0.9434
+epoch: 7
+train loss: 0.830637335905 / acc: 0.748166666667
+val loss: 0.18722314878 / acc: 0.941
+epoch: 8
+train loss: 0.816469089852 / acc: 0.750016666667
+val loss: 0.187234529212 / acc: 0.9467
+epoch: 9
+train loss: 0.817896625298 / acc: 0.752516666667
+val loss: 0.191356270586 / acc: 0.9458
+epoch: 10
+train loss: 0.810934116316 / acc: 0.755733333333
+val loss: 0.165329935053 / acc: 0.9508
+epoch: 11
+train loss: 0.804442213896 / acc: 0.755683333333
+val loss: 0.178542213868 / acc: 0.9493
+epoch: 12
+train loss: 0.796172097516 / acc: 0.759283333333
+val loss: 0.184680113545 / acc: 0.9484
+epoch: 13
+train loss: 0.79989196895 / acc: 0.759733333333
+val loss: 0.197082128211 / acc: 0.9498
+epoch: 14
+train loss: 0.791156772301 / acc: 0.7611
+val loss: 0.159888874008 / acc: 0.9552
+epoch: 15
+train loss: 0.787841799167 / acc: 0.764833333333
+val loss: 0.177519129872 / acc: 0.9529
+epoch: 16
+train loss: 0.776858549852 / acc: 0.76755
+val loss: 0.190103254269 / acc: 0.9451
+epoch: 17
+train loss: 0.779625648489 / acc: 0.765983333333
+val loss: 0.169680477297 / acc: 0.953
+epoch: 18
+train loss: 0.785229740298 / acc: 0.7641
+val loss: 0.171788577368 / acc: 0.9539
+epoch: 19
+train loss: 0.779977720899 / acc: 0.769466666667
+val loss: 0.176598994439 / acc: 0.949
+epoch: 20
+train loss: 0.775564449784 / acc: 0.767833333333
+val loss: 0.167892389282 / acc: 0.95
+epoch: 21
+train loss: 0.769345881083 / acc: 0.769316666667
+val loss: 0.156961511773 / acc: 0.954
+epoch: 22
+train loss: 0.779158531855 / acc: 0.766033333333
+val loss: 0.166796652529 / acc: 0.9548
+epoch: 23
+train loss: 0.776803241645 / acc: 0.769666666667
+val loss: 0.167695339439 / acc: 0.9512
+epoch: 24
+train loss: 0.760499370022 / acc: 0.7738
+val loss: 0.151309004808 / acc: 0.9594
+epoch: 25
+train loss: 0.767530533875 / acc: 0.7691
+val loss: 0.157034584592 / acc: 0.9523
+epoch: 26
+train loss: 0.764916090438 / acc: 0.77205
+val loss: 0.173176811702 / acc: 0.9479
+epoch: 27
+train loss: 0.757492321742 / acc: 0.77525
+val loss: 0.16699872496 / acc: 0.955
+epoch: 28
+train loss: 0.766646728111 / acc: 0.768516666667
+val loss: 0.166748880303 / acc: 0.9501
+epoch: 29
+train loss: 0.763872446094 / acc: 0.771933333333
+val loss: 0.173118736854 / acc: 0.9509
+epoch: 30
+train loss: 0.769510713589 / acc: 0.7671
+val loss: 0.163400849681 / acc: 0.9538
+epoch: 31
+train loss: 0.759182232313 / acc: 0.772766666667
+val loss: 0.191672965083 / acc: 0.9526
+epoch: 32
+train loss: 0.76660315062 / acc: 0.769216666667
+val loss: 0.160830114084 / acc: 0.9523
+epoch: 33
+train loss: 0.761318257731 / acc: 0.773483333333
+val loss: 0.172618148518 / acc: 0.9513
+epoch: 34
+train loss: 0.753272166364 / acc: 0.774383333333
+val loss: 0.170271756528 / acc: 0.95
+epoch: 35
+train loss: 0.758743911536 / acc: 0.773633333333
+val loss: 0.157461937541 / acc: 0.9554
+epoch: 36
+train loss: 0.759324712249 / acc: 0.771616666667
+val loss: 0.16293878403 / acc: 0.9534
+epoch: 37
+train loss: 0.757495472892 / acc: 0.774366666667
+val loss: 0.170071572584 / acc: 0.9533
+epoch: 38
+train loss: 0.756895878185 / acc: 0.772083333333
+val loss: 0.160236937595 / acc: 0.9557
+epoch: 39
+train loss: 0.74787151597 / acc: 0.776483333333
+val loss: 0.163551852484 / acc: 0.9572
+epoch: 40
+train loss: 0.753037060046 / acc: 0.775866666667
+val loss: 0.180775247609 / acc: 0.9443
+epoch: 41
+train loss: 0.744538466327 / acc: 0.776283333333
+val loss: 0.157077277881 / acc: 0.9519
+epoch: 42
+train loss: 0.755451755837 / acc: 0.775783333333
+val loss: 0.174015250198 / acc: 0.953
+epoch: 43
+train loss: 0.732827525745 / acc: 0.7806
+val loss: 0.155830191401 / acc: 0.9584
+epoch: 44
+train loss: 0.741473959425 / acc: 0.777216666667
+val loss: 0.148968660473 / acc: 0.9574
+epoch: 45
+train loss: 0.743819085069 / acc: 0.778716666667
+val loss: 0.168101823665 / acc: 0.9559
+epoch: 46
+train loss: 0.743388503917 / acc: 0.777416666667
+val loss: 0.152974979669 / acc: 0.9585
+epoch: 47
+train loss: 0.742603500875 / acc: 0.77815
+val loss: 0.149014461573 / acc: 0.9545
+epoch: 48
+train loss: 0.736864621823 / acc: 0.78095
+val loss: 0.159045301425 / acc: 0.9546
+epoch: 49
+train loss: 0.745386670606 / acc: 0.775416666667
+val loss: 0.148093598883 / acc: 0.9551
+val loss: 0.155747603163 / acc: 0.951916666667
+val loss: 0.148093598883 / acc: 0.9551

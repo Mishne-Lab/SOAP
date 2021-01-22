@@ -7,24 +7,22 @@ from functools import partial
 
 from cw_attack import L2Adversary
 from df_attack import DeepFool
-from spm_attack import spm
 
-# from defense import purify
-    
-G, G0 = [], []
+# from defenses import purify
 
-def purify(model, aux_criterion, X, epsilon=8/255, alpha=4/255, num_iter=5):
+# def purify(model, aux_criterion, X, epsilon=8/255, step_size=4/255, num_iter=5):
     
-    # epsilon, alpha, num_iter = 0.3, 0.1, 5
-    aux_track = torch.zeros(11, X.shape[0])
-    inv_track = torch.zeros(11, *X.shape)
-    for e in range(11):
-        defense = partial(defense_wrapper, criterion=aux_criterion, defense='pgd_linf', epsilon=e*epsilon/2, alpha=alpha, num_iter=num_iter)
-        inv_delta = defense(model, X=X)
-        inv_track[e] = inv_delta
-        aux_track[e, :] = aux_criterion(model, (X+inv_delta).clamp(0,1)).detach()
-    e_selected = aux_track.argmin(dim=0)
-    return inv_track[e_selected, torch.arange(X.shape[0])].to(X.device) + X
+#     if aux_criterion is None:
+#         return X
+#     aux_track = torch.zeros(11, X.shape[0])
+#     inv_track = torch.zeros(11, *X.shape)
+#     for e in range(11):
+#         defense = partial(defense_wrapper, criterion=aux_criterion, defense='pgd_linf', epsilon=e*epsilon/2, step_size=step_size, num_iter=num_iter)
+#         inv_delta = defense(model, X=X)
+#         inv_track[e] = inv_delta
+#         aux_track[e, :] = aux_criterion(model, (X+inv_delta).clamp(0,1)).detach()
+#     e_selected = aux_track.argmin(dim=0)
+#     return inv_track[e_selected, torch.arange(X.shape[0])].to(X.device) + X
 
 def empty(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
     return torch.zeros_like(X)
@@ -41,7 +39,10 @@ def fgsm(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
     if y is None:
         loss = criterion(model, X + delta)
     else:
-        loss = criterion(model(X + delta), y)
+        if criterion.func.__name__ == 'second_order':
+            loss = criterion(model, X + delta, y)
+        else:
+            loss = criterion(model(X + delta), y)
     loss.backward()
     if y is None:
         delta = epsilon * delta.grad.detach().sign()
@@ -49,7 +50,7 @@ def fgsm(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
         delta = epsilon * delta.grad.detach().sign()
     return (X + delta).clamp(*bound) - X
 
-def pgd_linf(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), alpha=0.01, num_iter=40, randomize=False):
+def pgd_linf(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), step_size=0.01, num_iter=40, randomize=False):
     """ Construct PGD adversarial examples on the examples X"""
     # model.eval()
     if randomize:
@@ -57,22 +58,24 @@ def pgd_linf(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), alpha=0.01, 
         delta.data = delta.data * 2 * epsilon - epsilon
     else:
         delta = torch.zeros_like(X, requires_grad=True)
-        
-    g = []
+
     for t in range(num_iter):
         if y is None:
             loss = criterion(model, X + delta)
         else:
-            loss = criterion(model(X + delta), y)
+            if criterion.func.__name__ == 'second_order':
+                loss = criterion(model, X + delta, y)
+            else:
+                loss = criterion(model(X + delta), y)
         loss.backward()
-        delta.data = (delta + alpha*delta.grad.detach().sign()).clamp(-epsilon,epsilon)
+        delta.data = (delta + step_size*delta.grad.detach().sign()).clamp(-epsilon,epsilon)
         delta.data = (X + delta).clamp(*bound) - X
         delta.grad.zero_()
 
     delta.data = (X + delta).clamp(*bound) - X
     return delta.detach()
 
-def bpda(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), alpha=0.01, num_iter=40, purify=purify):
+def bpda(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), step_size=0.01, num_iter=40, purify=None):
 
     delta = torch.zeros_like(X)
     for t in range(num_iter):
@@ -83,7 +86,7 @@ def bpda(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), alpha=0.01, num_
         loss = criterion(model(X_pfy), y)
         loss.backward()
 
-        delta.data = (delta + alpha*X_pfy.grad.detach().sign()).clamp(-epsilon,epsilon)
+        delta.data = (delta + step_size*X_pfy.grad.detach().sign()).clamp(-epsilon,epsilon)
         delta.data = (X + delta).clamp(*bound) - X
         X_pfy.grad.zero_()
 

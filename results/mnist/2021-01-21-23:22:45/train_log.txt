@@ -1,0 +1,15 @@
+None
+('training transformations: ', Compose(
+    ToTensor()
+))
+('optim: ', SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0001
+))
+('schedule: ', <torch.optim.lr_scheduler.StepLR object at 0x7fc9e4d2e650>)
+('attack: ', 'fgsm', '-', 0.1, ', ', 0.01, '*', 40)

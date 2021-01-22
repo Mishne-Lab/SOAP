@@ -26,7 +26,7 @@ def load_model(name, dataset, n_class=10, in_channel=3, save_dir=None, substitut
     elif name == 'wide-resnet-rot':
         model = WResNet(n_class=n_class)
     else:
-        raise TypeError("Unrecognized model name")
+        raise TypeError("Unrecognized model name: {}".format(name))
 
     if dataset == 'cifar10':
         model.add_normalizer(normalizer(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]))
@@ -243,7 +243,7 @@ class ResNet(nn.Module):
         self.pred = l
         return l
 
-    def add_normalizer(normalizer):
+    def add_normalizer(self, normalizer):
         self.resnet.add_normalizer(normalizer) 
 
 
@@ -272,5 +272,5 @@ class WResNet(nn.Module):
         self.pred = l
         return l
 
-    def add_normalizer(normalizer):
+    def add_normalizer(self, normalizer):
         self.resnet.add_normalizer(normalizer) 

@@ -1,0 +1,187 @@
+None
+('training transformations: ', Compose(
+    ToTensor()
+))
+('optim: ', SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0001
+))
+('schedule: ', <torch.optim.lr_scheduler.StepLR object at 0x7f099e7cf310>)
+('attack: ', None, '-', 0.1, ', ', 0.01, '*', 40)
+('auxiliary: ', 'rec', ' - alpha = 100.0')
+Start training...
+epoch: 0
+None
+('training transformations: ', Compose(
+    ToTensor()
+))
+('optim: ', SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0001
+))
+('schedule: ', <torch.optim.lr_scheduler.StepLR object at 0x7f840831f4d0>)
+('attack: ', None, '-', 0.1, ', ', 0.01, '*', 40)
+('auxiliary: ', 'rec', ' - alpha = 100.0')
+Start training...
+epoch: 0
+train loss: 0.415623647957 / acc: 0.86455 / err-aux: 0.112248641622
+val loss: 0.0914731604295 / acc: 0.9728
+epoch: 1
+train loss: 0.142687098696 / acc: 0.9522 / err-aux: 0.112011011403
+val loss: 0.0736052539152 / acc: 0.9771
+epoch: 2
+train loss: 0.114709964217 / acc: 0.961616666667 / err-aux: 0.111986258027
+val loss: 0.0617792267305 / acc: 0.983
+epoch: 3
+train loss: 0.100129689862 / acc: 0.966383333333 / err-aux: 0.11200327778
+val loss: 0.0616753882009 / acc: 0.984
+epoch: 4
+train loss: 0.0909576435398 / acc: 0.969533333333 / err-aux: 0.111998750215
+val loss: 0.0599304039644 / acc: 0.9839
+epoch: 5
+train loss: 0.0833105429505 / acc: 0.9718 / err-aux: 0.11199866119
+val loss: 0.0517402566686 / acc: 0.9847
+epoch: 6
+train loss: 0.0835882879467 / acc: 0.970716666667 / err-aux: 0.11201209083
+val loss: 0.0540661972629 / acc: 0.9854
+epoch: 7
+train loss: 0.0795001720763 / acc: 0.97235 / err-aux: 0.111990310315
+val loss: 0.0498844615974 / acc: 0.9853
+epoch: 8
+train loss: 0.0728213700713 / acc: 0.973916666667 / err-aux: 0.112005215122
+val loss: 0.0525602115955 / acc: 0.9857
+epoch: 9
+train loss: 0.0716878752917 / acc: 0.974166666667 / err-aux: 0.112003113931
+val loss: 0.0415556529372 / acc: 0.9887
+epoch: 10
+train loss: 0.0689692826321 / acc: 0.975083333333 / err-aux: 0.112011587231
+val loss: 0.04464552792 / acc: 0.9881
+epoch: 11
+train loss: 0.0677508334112 / acc: 0.975866666667 / err-aux: 0.112008150412
+val loss: 0.0534706793584 / acc: 0.9872
+epoch: 12
+train loss: 0.0659462236998 / acc: 0.9762 / err-aux: 0.112009826713
+val loss: 0.0437924416759 / acc: 0.9894
+epoch: 13
+train loss: 0.0658711913623 / acc: 0.976933333333 / err-aux: 0.112009021159
+val loss: 0.0447725216752 / acc: 0.9881
+epoch: 14
+train loss: 0.0624628124687 / acc: 0.97775 / err-aux: 0.112012378203
+val loss: 0.0495328788139 / acc: 0.9864
+epoch: 15
+train loss: 0.0608324196436 / acc: 0.978183333333 / err-aux: 0.111999502581
+val loss: 0.0437668088022 / acc: 0.9889
+epoch: 16
+train loss: 0.061740532215 / acc: 0.978 / err-aux: 0.111999928442
+val loss: 0.052289848935 / acc: 0.9863
+epoch: 17
+train loss: 0.0598058386379 / acc: 0.9779 / err-aux: 0.112001882404
+val loss: 0.0524505597504 / acc: 0.9866
+epoch: 18
+train loss: 0.0591775721624 / acc: 0.978783333333 / err-aux: 0.1113177419
+val loss: 0.0685760096376 / acc: 0.9854
+epoch: 19
+train loss: 0.0740269403825 / acc: 0.97415 / err-aux: 0.0171387770699
+val loss: 0.0462358221412 / acc: 0.9869
+epoch: 20
+train loss: 0.0694692650945 / acc: 0.97555 / err-aux: 0.0114495631479
+val loss: 0.0488652885432 / acc: 0.986
+epoch: 21
+train loss: 0.0652947516268 / acc: 0.9767 / err-aux: 0.01082690326
+val loss: 0.0491242306425 / acc: 0.9865
+epoch: 22
+train loss: 0.0599865450993 / acc: 0.977716666667 / err-aux: 0.0104486374821
+val loss: 0.040531034546 / acc: 0.9891
+epoch: 23
+train loss: 0.0600250272446 / acc: 0.977916666667 / err-aux: 0.0102502350083
+val loss: 0.0503192921228 / acc: 0.9866
+epoch: 24
+train loss: 0.058542288812 / acc: 0.978883333333 / err-aux: 0.0100392546409
+val loss: 0.0530161570899 / acc: 0.9855
+epoch: 25
+train loss: 0.0569044761877 / acc: 0.97945 / err-aux: 0.00993555885517
+val loss: 0.0430523399971 / acc: 0.9885
+epoch: 26
+train loss: 0.0551643813562 / acc: 0.979466666667 / err-aux: 0.00978610497247
+val loss: 0.0451116482433 / acc: 0.9876
+epoch: 27
+train loss: 0.0545998582115 / acc: 0.980133333333 / err-aux: 0.00969787180607
+val loss: 0.0453604411428 / acc: 0.9876
+epoch: 28
+train loss: 0.0563135308166 / acc: 0.979233333333 / err-aux: 0.00964331842012
+val loss: 0.0439947703971 / acc: 0.988
+epoch: 29
+train loss: 0.0530729320171 / acc: 0.980083333333 / err-aux: 0.00955448395963
+val loss: 0.0457063450985 / acc: 0.9878
+epoch: 30
+train loss: 0.0538080052003 / acc: 0.980766666667 / err-aux: 0.00947945031664
+val loss: 0.051013802638 / acc: 0.9872
+epoch: 31
+train loss: 0.0516712851305 / acc: 0.98105 / err-aux: 0.00945622249483
+val loss: 0.0490324766481 / acc: 0.9874
+epoch: 32
+train loss: 0.051989489239 / acc: 0.98105 / err-aux: 0.00940330470634
+val loss: 0.0493748479912 / acc: 0.9879
+epoch: 33
+train loss: 0.0496649048729 / acc: 0.982016666667 / err-aux: 0.00936536578079
+val loss: 0.0497949877872 / acc: 0.9879
+epoch: 34
+train loss: 0.0487592460182 / acc: 0.98205 / err-aux: 0.00933951460438
+val loss: 0.0451598789401 / acc: 0.9889
+epoch: 35
+train loss: 0.0519601940456 / acc: 0.980866666667 / err-aux: 0.00929602460824
+val loss: 0.0470982363235 / acc: 0.9879
+epoch: 36
+train loss: 0.0496925239881 / acc: 0.9817 / err-aux: 0.00926291966875
+val loss: 0.0462238216136 / acc: 0.9881
+epoch: 37
+train loss: 0.050188059839 / acc: 0.9812 / err-aux: 0.00922063875617
+val loss: 0.0493707727594 / acc: 0.9876
+epoch: 38
+train loss: 0.0481599315436 / acc: 0.981916666667 / err-aux: 0.00918435779774
+val loss: 0.0454712811433 / acc: 0.9876
+epoch: 39
+train loss: 0.0488388767609 / acc: 0.9815 / err-aux: 0.00919334507054
+val loss: 0.0495821546433 / acc: 0.9872
+epoch: 40
+train loss: 0.0463072577189 / acc: 0.982666666667 / err-aux: 0.00912807083442
+val loss: 0.0459725979857 / acc: 0.988
+epoch: 41
+train loss: 0.0470996059549 / acc: 0.982566666667 / err-aux: 0.00914770925943
+val loss: 0.051227123677 / acc: 0.9871
+epoch: 42
+train loss: 0.0495544617725 / acc: 0.98185 / err-aux: 0.00911160179764
+val loss: 0.0516674643547 / acc: 0.9857
+epoch: 43
+train loss: 0.0463951064003 / acc: 0.982733333333 / err-aux: 0.00906130189323
+val loss: 0.045838459053 / acc: 0.9887
+epoch: 44
+train loss: 0.0457440157875 / acc: 0.983116666667 / err-aux: 0.00906133205972
+val loss: 0.0468174492634 / acc: 0.988
+epoch: 45
+train loss: 0.0476704441831 / acc: 0.982233333333 / err-aux: 0.00904480423818
+val loss: 0.0537510531943 / acc: 0.9868
+epoch: 46
+train loss: 0.0457325100373 / acc: 0.982933333333 / err-aux: 0.009021752303
+val loss: 0.0421013008284 / acc: 0.9891
+epoch: 47
+train loss: 0.0485893596823 / acc: 0.981883333333 / err-aux: 0.00902537339263
+val loss: 0.0504510584228 / acc: 0.9876
+epoch: 48
+train loss: 0.0461218666612 / acc: 0.98235 / err-aux: 0.00903248063858
+val loss: 0.0458207039422 / acc: 0.9884
+epoch: 49
+train loss: 0.0463109152495 / acc: 0.98285 / err-aux: 0.00896060060009
+val loss: 0.0487083091483 / acc: 0.9886
+val loss: 0.00732904036617 / acc: 0.996083333333
+val loss: 0.0487083091483 / acc: 0.9886

@@ -1,0 +1,6 @@
+adv loss: 5.80474678474 / acc: 0.3132
+<functools.partial object at 0x7fdc0d810b90>
+<functools.partial object at 0x7fa5fd67db90>
+<functools.partial object at 0x7f4feda28b90>
+<functools.partial object at 0x7fa099adbb90>
+adv loss: 7.21675390533 / acc: 0.2812

@@ -9,7 +9,8 @@ from torch.utils.data import Dataset, DataLoader
 from datasets import *
 from utils import *
 from attacks import *
-from model import *
+from defenses import *
+from models import *
 from criterions import *
 
 import argparse
@@ -26,9 +27,11 @@ def train_main(args):
     torch.manual_seed(0)
 
     # path initialization
+    if args.name is None:
+        args.name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
     save_dir = os.path.join(args.save_dir, args.dataset, args.name)
     if not os.path.exists(save_dir):
-        os.mkdir(save_dir)
+        os.makedirs(save_dir)
 
     if os.path.exists('{}/latest_model.pth'.format(save_dir)) and not args.pretrained:
         print('model exists!')
@@ -38,15 +41,13 @@ def train_main(args):
     file = open(os.path.join(save_dir, 'train_log.txt'), 'a')
     sys.stdout = file
 
-    print(args.note)
-
     # load data
     if args.auxiliary == 'pi':
         train_transform = load_transform(args.dataset, mod='test') # data augmentation is wrapped in the auxiliary loss function
     else:
         train_transform = load_transform(args.dataset, mod='train')
     test_transform = load_transform(args.dataset, mod='test')
-    print(train_transform)
+    print('training transformations: ', train_transform)
     
     train_set = load_dataset(name=args.dataset, mod='train', transform=train_transform)
     test_set = load_dataset(name=args.dataset, mod='test', transform=test_transform)
@@ -72,10 +73,6 @@ def train_main(args):
         model = load_model(args.model, args.dataset, n_class, in_channel, save_dir=save_dir, )
     else:
         model = load_model(args.model, args.dataset, n_class, in_channel).to(device)
-    # print(model)
-    
-    if args.use_fb:
-        model = fb.PyTorchModel(model, bounds=(0,1))
 
     # optimizer initialization
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=1e-4)
@@ -89,46 +86,25 @@ def train_main(args):
     # attacks intialization
     args.epsilon = args.epsilon / 255 if args.epsilon > 1 else args.epsilon
     args.step_size = args.step_size / 255 if args.step_size > 0.1 else args.step_size
-    if args.use_fb:
+    if args.attack is not None:
         if args.attack == 'fgsm':
-            attack = partial(fb.attacks.FGSM(), epsilon=args.epsilon)
+            attack = partial(globals()[args.attack], epsilon=args.epsilon)
         elif args.attack == 'pgd_linf':
-            attack = fb.attacks.LinfPGD()
-        elif args.attack == 'cw_l2':
-            attack = fb.attacks.L2CarliniWagnerAttack()
-        elif args.attack == 'deepfool':
-            attack = fb.attacks.LinfDeepFoolAttack()
-        else:
-            attack = None
+            attack = partial(globals()[args.attack], epsilon=args.epsilon, alpha=args.step_size, num_iter=args.num_iter)
     else:
-        if args.attack is not None:
-            if args.attack == 'fgsm':
-                attack = partial(globals()[args.attack], epsilon=args.epsilon)
-            elif args.attack == 'pgd_linf':
-                attack = partial(globals()[args.attack], epsilon=args.epsilon, alpha=args.step_size, num_iter=args.num_iter)
-        else:
-            attack = None
+        attack = None
     print('attack: ', args.attack, '-', args.epsilon, ', ', args.step_size, '*', args.num_iter)
 
     # criterion initialization
     if args.auxiliary == 'rec':
         criterion = partial(joint_criterion, aux_criterion=recon_criterion, alpha=args.alpha)
-        print('alpha = 100')
-    elif args.auxiliary == 'rec_with_dis':
-        criterion = partial(joint_criterion, aux_criterion=recon_criterion_with_dis, alpha=args.alpha)
-        model.D = Discriminator(in_channel=in_channel).to(device)
-        for p in model.D.parameters():
-            p.requires_grad = False
-        print('alpha = 1')
     elif args.auxiliary == 'pi':
         criterion = partial(joint_criterion, aux_criterion=pi_criterion, alpha=args.alpha)
-        print('alpha = 1')
     elif args.auxiliary == 'rot':
         criterion = partial(joint_criterion, aux_criterion=rotate_criterion, alpha=args.alpha)
-        print('alpha = 0.1')
     else:
         criterion = nn.CrossEntropyLoss()
-    print('auxiliary: ', args.auxiliary)
+    print('auxiliary: ', args.auxiliary, ' - alpha = {}'.format(args.alpha))
 
     # model training
     print('Start training...')
@@ -145,7 +121,7 @@ def train_main(args):
         # model validation
         if epoch % args.validate_freq == 0:
             evaluate(model, test_loader, nn.CrossEntropyLoss(), device)
-        if epoch % 20 == 0:
+        if epoch % args.save_freq == 0:
             torch.save(model.state_dict(), '{}/latest_model_{}.pth'.format(save_dir, epoch))
 
     torch.save(model.state_dict(), '{}/latest_model.pth'.format(save_dir))
@@ -168,7 +144,7 @@ def train_sub(args):
 
     # import targeted model
     in_channel = 1 if args.dataset == 'mnist' or args.dataset == 'fmnist' else 3
-    tar_model = load_model(args.model, in_channel, save_dir=save_dir)
+    tar_model = load_model(args.model, args.dataset, in_channel, save_dir=save_dir)
     tar_model.eval()
 
     # parallelism
@@ -230,10 +206,8 @@ def train_sub(args):
 
 def test_main(args):
 
-    if args.ssl:
-        save_dir = os.path.join(args.save_dir, args.dataset, args.name, 'alpha-100')
-    else:
-        save_dir = os.path.join(args.save_dir, args.dataset, args.name)
+    assert args.name is not None
+    save_dir = os.path.join(args.save_dir, args.dataset, args.name)
 
     # redirect output
     file = open(os.path.join(save_dir, 'test_log.txt'), 'a')
@@ -248,7 +222,7 @@ def test_main(args):
 
     in_channel = 1 if args.dataset == 'mnist' or args.dataset == 'fmnist' else 3
     n_class = 100 if args.dataset == 'cifar100' else 10
-    model = load_model(args.model, n_class, in_channel, save_dir=save_dir)
+    model = load_model(args.model, args.dataset, n_class, in_channel, save_dir=save_dir)
 
     # criterion & device
     if args.device == 'cuda':
@@ -275,7 +249,7 @@ def test_main(args):
         aux_criterion = None
 
     if args.second_order:
-        criterion = partial(second_order, df_criterion=aux_criterion)
+        criterion = partial(second_order, df_criterion=aux_criterion, beta=args.beta)
         print(criterion)
     else:
         criterion = nn.CrossEntropyLoss()
@@ -284,18 +258,20 @@ def test_main(args):
     if args.attack != 'cw' and args.attack != 'df':
         args.epsilon = args.epsilon / 255 if args.dataset == 'cifar10' or args.dataset == 'cifar100' else args.epsilon
         args.step_size = args.step_size / 255 if args.dataset == 'cifar10' or args.dataset == 'cifar100' else args.step_size
+        args.pfy_delta = args.pfy_delta / 255 if args.dataset == 'cifar10' or args.dataset == 'cifar100' else args.pfy_delta
+        args.pfy_step_size = args.pfy_step_size / 255 if args.dataset == 'cifar10' or args.dataset == 'cifar100' else args.pfy_step_size
 
     if args.attack is not None:
         if args.attack == 'fgsm':
             attack = partial(globals()[args.attack], epsilon=args.epsilon)
         elif args.attack == 'pgd_linf':
-            attack = partial(globals()[args.attack], epsilon=args.epsilon, alpha=args.step_size, num_iter=args.num_iter)
+            attack = partial(globals()[args.attack], epsilon=args.epsilon, step_size=args.step_size, num_iter=args.num_iter)
         elif args.attack == 'cw':
             attack = partial(globals()[args.attack], epsilon=args.epsilon, num_classes=n_class)
         elif args.attack == 'df':
             attack = partial(globals()[args.attack], epsilon=args.epsilon)
         elif args.attack == 'bpda':
-            attack = partial(globals()[args.attack], epsilon=args.epsilon, alpha=args.step_size, num_iter=args.num_iter, purify=partial(globals()['purify'], aux_criterion=aux_criterion))
+            attack = partial(globals()[args.attack], epsilon=args.epsilon, step_size=args.step_size, num_iter=args.num_iter, purify=partial(globals()['purify'], aux_criterion=aux_criterion))
         elif args.attack == 'black_box':
             # black-box fgsm attack
             sub_model = load_model(args.sub_model, in_channel, save_dir=save_dir, substitute=True).to(device)
@@ -303,20 +279,17 @@ def test_main(args):
             attack = partial(fgsm, model=sub_model, epsilon=args.epsilon)
         elif args.attack == 'empty':
             attack = partial(globals()[args.attack])
-    else:
-        attack = None
 
-    # if args.auxiliary is not None:
-    #     for e in torch.arange(0, 6, 1):
-    #         torch.manual_seed(0)
-    #         # defense = partial(defense_wrapper, criterion=aux_criterion, defense=args.defense, epsilon=e.item()*args.epsilon/3, alpha=10, num_iter=10)
-    #         # defense = partial(defense_wrapper, criterion=aux_criterion, defense=args.defense, epsilon=e.item()*args.epsilon/3, alpha=0.1, num_iter=5)
-    #         defense = partial(defense_wrapper, criterion=aux_criterion, defense=args.defense, epsilon=e.item()*8/255/2, alpha=4/255, num_iter=5)
-    #         evaluate_adversarial(model, test_loader, criterion, aux_criterion, attack, defense, device, save_images=True, use_fb=args.use_fb)
-    # else:
-    #     defense = None
-    #     # evaluate(model, test_loader, criterion, device)
-    #     evaluate_adversarial(model, test_loader, criterion, aux_criterion, attack, defense, device, save_images=True, use_fb=args.use_fb)
+    if args.defense is not None:
+        assert args.auxiliary is not None
+        pfy = partial(purify, defense_mode=args.defense, delta=args.pfy_delta, step_size=args.pfy_step_size, num_iter=args.pfy_num_iter)
+    else:
+        defense = None
+
+    if args.attack is not None:
+        evaluate_adversarial(model, test_loader, criterion, aux_criterion, attack, pfy, device)
+    else:
+        evaluate(model, test_loader, criterion, device)
 
     file.close()
 
@@ -326,29 +299,32 @@ def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch Adversarial Robustness')
 
     # running and saving
-    parser.add_argument('-sd', '--save-dir', default='/data2/changhao/Adversarial-Purification/results', help='path where to save')
-    parser.add_argument('-n', '--name', default=None, help='folder in save path')
+    parser.add_argument('-sd', '--save-dir', default='/data2/changhao/SOAP-Self-supervised-Online-Adversarial-Purification/results', help='path where to save')
+    parser.add_argument('-n', '--name', default=None, help='folder in the save path')
     parser.add_argument('-p', '--pretrained', dest="pretrained", help="Use pre-trained models", action="store_true")
     parser.add_argument('-t', '--test-only', dest="test_only", help="Only test the model", action="store_true")
-    parser.add_argument('--ssl', help="sel-supervised learning", action="store_true")
     parser.add_argument('--sub', help="train substitute model", action="store_true")
-    parser.add_argument('-nt', '--note', default='None', help='info about the expriment')
 
     # model and dataset
     parser.add_argument('-m', '--model', default='fcnet', help='type of the model')
     parser.add_argument('-sm', '--sub-model', default='fcnet', help='type of the substitute model')
     parser.add_argument('-d', '--dataset', default='mnist', help='name of the dataset')
 
-    # adversarial attacks / defense
-    parser.add_argument('--use-fb', help="use foolbox", action="store_true")
+    # adversarial attacks
     parser.add_argument('-at', '--attack', default=None, help="adversarial attack strategy")
-    parser.add_argument('-e', '--epsilon', type=float, default=0.1)
-    parser.add_argument('-s', '--step_size', type=float, default=0.01)
-    parser.add_argument('-ni', '--num_iter', type=int, default=40)
+    parser.add_argument('-e', '--epsilon', type=float, default=0.1, help="adversary epsilon")
+    parser.add_argument('-s', '--step-size', type=float, default=0.01, help="pgd adversary step size")
+    parser.add_argument('-ni', '--num-iter', type=int, default=40, help="pgd adversary number of iteration")
+    parser.add_argument('-so', '--second-order', help="use second order attack", action="store_true")
+    parser.add_argument('-b', '--beta', type=float, default=1, help="weight of auxiliary aware adversaries")
+
+    # adversarial defense (purification)
     parser.add_argument('-df', '--defense', default=None, help="adversarial defense strategy")
     parser.add_argument('-aux', '--auxiliary', default=None, help="auxiliary task for defense")
-    parser.add_argument('--tat', help="test-time adversarial training", action="store_true")
-    parser.add_argument('-so', '--second-order', help="use second order attack", action="store_true")
+    parser.add_argument('-a', '--alpha', type=float, default=1, help="weight of auxiliary loss during training")
+    parser.add_argument('-pd', '--pfy-delta', type=float, default=0.1, help="unit increment when purifier searching for the best purification epsilon")
+    parser.add_argument('-ps', '--pfy-step-size', type=float, default=0.1, help="purifier step size")
+    parser.add_argument('-pni', '--pfy-num-iter', type=int, default=5, help="purifier number of iteration")
     
     # optimization
     parser.add_argument('--device', default='cuda', help='device')
@@ -363,7 +339,7 @@ def parse_args():
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M')
     # parser.add_argument('--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay (default: 1e-4)', dest='weight_decay')
     parser.add_argument('--validate-freq', default=1, type=int, help='validation frequency')
-    parser.add_argument('-gs', '--grid-search', dest="grid_search", help='use grid search', action="store_true")
+    parser.add_argument('--save-freq', default=20, type=int, help='save model frequency')
 
     args = parser.parse_args()
 

@@ -5,6 +5,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from torch.autograd import grad, Variable
 
 from attacks import *
+# from defenses import *
 from criterions import *
 
 import os
@@ -12,9 +13,6 @@ import copy
 import pickle
 import numpy as np
 from collections import deque
-
-import foolbox as fb
-from foolbox import attacks
 
 
 def train(model, train_loader, criterion, optimizer, scheduler, device):
@@ -127,30 +125,21 @@ def evaluate_auxiliary(model, eval_loader, aux_criterion, device):
     error = error / len(eval_loader)
     print('val loss: {}'.format(error))
 
-def evaluate_adversarial(model, loader, criterion, aux_criterion, attack, defense, device, save_images=False, use_fb=False):
+def evaluate_adversarial(model, loader, criterion, aux_criterion, attack, purify, device):
 
     model.eval()
-    if use_fb:
-        fmodel = fb.PyTorchModel(model, bounds=(0,1))
     error, acc = 0., 0.
     clean, adv, df = 0., 0., 0.
     for X, y in loader:
         X, y = X.to(device), y.to(device)
-        if attack is not None:
-            if use_fb:
-                raw, clipped, is_adv = attack(fmodel, X, y)
-                delta = clipped - X
-            else:
-                if 'model' in attack.keywords.keys(): # if substitute model is specified
-                    delta = attack(criterion=criterion, X=X, y=y)
-                else:
-                    delta = attack(model, criterion, X, y)
-
-            X_pfy = purify(model, aux_criterion, X+delta)
-            pred = model(X_pfy)
-            
+        
+        if 'model' in attack.keywords.keys(): # if substitute model is specified
+            delta = attack(criterion=criterion, X=X, y=y)
         else:
-            pred = model(X)
+            delta = attack(model, criterion, X, y)
+
+        X_pfy = purify(model, aux_criterion, X+delta)
+        pred = model(X_pfy)
 
         loss = nn.functional.cross_entropy(pred, y)
         error += loss.item() 
