@@ -6,3 +6,5 @@ SOAP yields competitive robust accuracy against state-of-the-art adversarial tra
 In addition, our approach is robust even when adversaries are given knowledge of the purification defense strategy.
 To the best of our knowledge, our paper is the first that generalizes the idea of using self-supervised signals to perform online test-time purification.
 This paper is accepted to ICLR2021.
+
+Paper: https://openreview.net/forum?id=_i3ASPp12WS
