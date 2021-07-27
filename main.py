@@ -81,7 +81,6 @@ def train_main(args):
     scheduler = optim.lr_scheduler.StepLR(optimizer, args.lr_step, args.lr_gamma)
     print('optim: ', optimizer)
     print('schedule: ', scheduler)
-    # print('lr: ', args.lr, '- patience: ', args.lr_step)
 
     # attacks intialization
     args.epsilon = args.epsilon / 255 if args.epsilon > 1 else args.epsilon
@@ -178,7 +177,6 @@ def train_sub(args):
             y = tar_model(data).argmax(dim=1)
         else:
             lmbda = (2 * int(int(sub_epoch / 3) == 0) - 1) * 0.1
-            # lmbda = 0.1
             print('lambda: ', lmbda)
             new_data = jacobian_augment(model, train_loader, lmbda, device)
             data = torch.cat([data, new_data], dim=0)
@@ -299,7 +297,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch Adversarial Robustness')
 
     # running and saving
-    parser.add_argument('-sd', '--save-dir', default='/data2/changhao/SOAP-Self-supervised-Online-Adversarial-Purification/results', help='path where to save')
+    parser.add_argument('-sd', '--save-dir', default='./results', help='path where to save')
     parser.add_argument('-n', '--name', default=None, help='folder in the save path')
     parser.add_argument('-p', '--pretrained', dest="pretrained", help="Use pre-trained models", action="store_true")
     parser.add_argument('-t', '--test-only', dest="test_only", help="Only test the model", action="store_true")

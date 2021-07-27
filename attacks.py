@@ -8,40 +8,26 @@ from functools import partial
 from cw_attack import L2Adversary
 from df_attack import DeepFool
 
-# from defenses import purify
-
-# def purify(model, aux_criterion, X, epsilon=8/255, step_size=4/255, num_iter=5):
-    
-#     if aux_criterion is None:
-#         return X
-#     aux_track = torch.zeros(11, X.shape[0])
-#     inv_track = torch.zeros(11, *X.shape)
-#     for e in range(11):
-#         defense = partial(defense_wrapper, criterion=aux_criterion, defense='pgd_linf', epsilon=e*epsilon/2, step_size=step_size, num_iter=num_iter)
-#         inv_delta = defense(model, X=X)
-#         inv_track[e] = inv_delta
-#         aux_track[e, :] = aux_criterion(model, (X+inv_delta).clamp(0,1)).detach()
-#     e_selected = aux_track.argmin(dim=0)
-#     return inv_track[e_selected, torch.arange(X.shape[0])].to(X.device) + X
-
 def empty(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
     return torch.zeros_like(X)
 
 def inject_noise(X, epsilon=0.1, bound=(0,1)):
     """ Construct FGSM adversarial examples on the examples X"""
-    # model.eval()
     return (X + torch.randn_like(X) * epsilon).clamp(*bound) - X
 
 def fgsm(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
     """ Construct FGSM adversarial examples on the examples X"""
-    # model.eval()
     delta = torch.zeros_like(X, requires_grad=True)
     if y is None:
         loss = criterion(model, X + delta)
     else:
-        if criterion.func.__name__ == 'second_order':
-            loss = criterion(model, X + delta, y)
-        else:
+        try:
+            criterion_name = criterion.func.__name__
+            if criterion_name == 'second_order':
+                loss = criterion(model, X + delta, y)
+            else:
+                loss = criterion(model(X + delta), y)
+        except:
             loss = criterion(model(X + delta), y)
     loss.backward()
     if y is None:
@@ -52,7 +38,6 @@ def fgsm(model, criterion, X, y=None, epsilon=0.1, bound=(0,1)):
 
 def pgd_linf(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), step_size=0.01, num_iter=40, randomize=False):
     """ Construct PGD adversarial examples on the examples X"""
-    # model.eval()
     if randomize:
         delta = torch.rand_like(X, requires_grad=True)
         delta.data = delta.data * 2 * epsilon - epsilon
@@ -63,9 +48,13 @@ def pgd_linf(model, criterion, X, y=None, epsilon=0.1, bound=(0,1), step_size=0.
         if y is None:
             loss = criterion(model, X + delta)
         else:
-            if criterion.func.__name__ == 'second_order':
-                loss = criterion(model, X + delta, y)
-            else:
+            try:
+                criterion_name = criterion.func.__name__
+                if criterion_name == 'second_order':
+                    loss = criterion(model, X + delta, y)
+                else:
+                    loss = criterion(model(X + delta), y)
+            except:
                 loss = criterion(model(X + delta), y)
         loss.backward()
         delta.data = (delta + step_size*delta.grad.detach().sign()).clamp(-epsilon,epsilon)

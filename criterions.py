@@ -47,7 +47,7 @@ def random_trans_combo(tensor, df=False):
         h = torch.randint(24, 32-r_h, (1,))
         w = torch.randint(24, 32-r_w, (1,))
     else:
-        r_h, r_w, h, w = 4, 4, 24, 24
+        r_h, r_w, h, w = 2, 2, 28, 28
     tensor = tensor[:, :, r_h:r_h+h, r_w:r_w+w]
     return nn.functional.interpolate(tensor, [32, 32])
 
