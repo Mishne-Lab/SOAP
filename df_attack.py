@@ -5,7 +5,6 @@ from torch.autograd import Variable
 
 import numpy as np
 import copy
-from torch.autograd.gradcheck import zero_gradients
 
 class DeepFool():
     r"""
@@ -30,68 +29,11 @@ class DeepFool():
 
     def __call__(self, model, images):
 
-        # images = images.permute((0,2,3,1))
         adv_images = images.detach().clone()
         for b in range(images.shape[0]):
             r_tot, loop_i, label, k_i, pert_image = deepfool(images[b], model, num_classes=10, overshoot=0.02, max_iter=self.steps)
-            # print(pert_image.shape)
             adv_images[b:b+1] = pert_image
-        # for b in range(images.shape[0]):
-
-        #     image = images[b:b+1, :, :, :]
-
-        #     image.requires_grad = True
-        #     output = model(image)[0]
-
-        #     _, pre_0 = torch.max(output, 0)
-        #     f_0 = output[pre_0]
-        #     grad_f_0 = torch.autograd.grad(f_0, image,
-        #                                    retain_graph=False,
-        #                                    create_graph=False)[0]
-        #     num_classes = len(output)
-
-        #     for i in range(self.steps):
-        #         image.requires_grad = True
-        #         output = model(image)[0]
-        #         _, pre = torch.max(output, 0)
-
-        #         if pre != pre_0:
-        #             image = torch.clamp(image, min=0, max=1).detach()
-        #             break
-
-        #         r = None
-        #         min_value = None
-
-        #         for k in range(num_classes):
-        #             if k == pre_0:
-        #                 continue
-
-        #             f_k = output[k]
-        #             grad_f_k = torch.autograd.grad(f_k, image,
-        #                                            retain_graph=True,
-        #                                            create_graph=True)[0]
-
-        #             f_prime = f_k - f_0
-        #             grad_f_prime = grad_f_k - grad_f_0
-        #             value = torch.abs(f_prime)/torch.norm(grad_f_prime)
-
-        #             if r is None:
-        #                 r = (torch.abs(f_prime)/(torch.norm(grad_f_prime)**2))*grad_f_prime
-        #                 min_value = value
-        #             else:
-        #                 if min_value > value:
-        #                     r = (torch.abs(f_prime)/(torch.norm(grad_f_prime)**2))*grad_f_prime
-        #                     min_value = value
-
-        #         image = torch.clamp(image + r, min=0, max=1).detach()
-
-        #     images[b:b+1, :, :, :] = image
-
-        # adv_images = images
-        # print('1 batch')
-        # print(adv_images.shape)
         return adv_images
-        # return adv_images.permute((0,3,1,2))
 
 
 def deepfool(image, net, num_classes=10, overshoot=0.02, max_iter=50):
@@ -104,17 +46,7 @@ def deepfool(image, net, num_classes=10, overshoot=0.02, max_iter=50):
        :param max_iter: maximum number of iterations for deepfool (default = 50)
        :return: minimal perturbation that fools the classifier, number of iterations that it required, new estimated_label and perturbed image
     """
-    # is_cuda = torch.cuda.is_available()
-
-    # if is_cuda:
-    #     # print("Using GPU")
-    #     image = image.cuda()
-    #     net = net.cuda()
-    # else:
-    #     None
-    #     # print("Using CPU")
-
-
+    from torch.autograd.gradcheck import zero_gradients
     f_image = net.forward(Variable(image[None, :, :, :], requires_grad=True)).data.cpu().numpy().flatten()
     I = (np.array(f_image)).flatten().argsort()[::-1]
 
