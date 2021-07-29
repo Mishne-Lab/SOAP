@@ -1,4 +1,0 @@
-None
-('training transformations: ', Compose(
-    ToTensor()
-))
