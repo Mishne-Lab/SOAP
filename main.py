@@ -210,7 +210,7 @@ def test_main(args):
     # redirect output
     file = open(os.path.join(save_dir, 'test_log.txt'), 'a')
     sys.stdout = file
-    print('/n', datetime.datetime.now())
+    print(datetime.datetime.now())
 
     # data loading
     transform = load_transform(args.dataset, mod='test')
